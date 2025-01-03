@@ -26,6 +26,27 @@ def plot_sample_images(X, y):
 # Plotting sample images
 plot_sample_images(X_train, y_train)
 
+# Function to plot training history
+def plot_training_history(history):
+    plt.figure(figsize=(12, 4))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'], label='Train Accuracy')
+    plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.title('Model Accuracy')
+
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'], label='Train Loss')
+    plt.plot(history.history['val_loss'], label='Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.title('Model Loss')
+    plt.show()
+
 # Creating the ANN model
 model = Sequential([
     Input(shape=(28, 28)),  # Definiowanie kształtu wejścia
@@ -50,6 +71,9 @@ history = model.fit(
     batch_size=32,
     verbose=2
 )
+
+# Plotting training history
+plot_training_history(history)
 
 # Evaluating the model
 test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=0)
