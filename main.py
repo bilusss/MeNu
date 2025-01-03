@@ -49,7 +49,7 @@ def plot_training_history(history):
 
 # Creating the ANN model
 model = Sequential([
-    Input(shape=(28, 28)),  # Definiowanie kształtu wejścia
+    Input(shape=(28, 28)),
     Flatten(),
     Dense(128, activation='relu'),
     Dense(64, activation='relu'),
@@ -67,7 +67,7 @@ model.compile(
 history = model.fit(
     X_train, y_train,
     validation_split=0.2,
-    epochs=5,
+    epochs=10,
     batch_size=32,
     verbose=2
 )
