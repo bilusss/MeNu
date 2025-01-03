@@ -1,7 +1,7 @@
 import tensorflow as tf
 from keras.datasets import mnist
 from keras.models import Sequential
-from keras.layers import Flatten, Dense
+from keras.layers import Flatten, Dense, Input
 from keras.optimizers import Adam
 from keras.losses import SparseCategoricalCrossentropy
 
@@ -14,7 +14,8 @@ X_test = X_test / 255.0
 
 # Creating the ANN model
 model = Sequential([
-    Flatten(input_shape=(28, 28)),
+    Input(shape=(28, 28)),
+    Flatten(),
     Dense(128, activation='relu'),
     Dense(64, activation='relu'),
     Dense(10, activation='softmax')
@@ -35,5 +36,6 @@ history = model.fit(
     verbose=2
 )
 
+# Evaluating the model
 test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=0)
 print(f"Test accuracy: {test_accuracy:.4f}\nTest loss: {test_loss:.4f}")
