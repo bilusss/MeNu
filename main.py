@@ -4,6 +4,7 @@ from keras.models import Sequential
 from keras.layers import Flatten, Dense, Input
 from keras.optimizers import Adam
 from keras.losses import SparseCategoricalCrossentropy
+import matplotlib.pyplot as plt
 
 # Loading MNIST data (database of handwritten numbers)
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -12,9 +13,22 @@ from keras.losses import SparseCategoricalCrossentropy
 X_train = X_train / 255.0
 X_test = X_test / 255.0
 
+# Function to plot sample images
+def plot_sample_images(X, y):
+    plt.figure(figsize=(10, 10))
+    for i in range(16):
+        plt.subplot(4, 4, i + 1)
+        plt.imshow(X[i], cmap='gray')
+        plt.title(f"Label: {y[i]}")
+        plt.axis('off')
+    plt.show()
+
+# Plotting sample images
+plot_sample_images(X_train, y_train)
+
 # Creating the ANN model
 model = Sequential([
-    Input(shape=(28, 28)),
+    Input(shape=(28, 28)),  # Definiowanie kształtu wejścia
     Flatten(),
     Dense(128, activation='relu'),
     Dense(64, activation='relu'),
@@ -27,6 +41,7 @@ model.compile(
     loss=SparseCategoricalCrossentropy(),
     metrics=['accuracy']
 )
+
 # Training the model
 history = model.fit(
     X_train, y_train,
