@@ -81,6 +81,7 @@ zapewnia, że wagi początkowe są dobrze zbalansowane. Model uczy się szybko i
 Loss Plot: Obie krzywe strat (treningowa i walidacyjna) są gładkie i spójne, co wskazuje, że inicjalizacja wag
 przyczyniła się do efektywnego trenowania.
 
+
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 '''
 
@@ -169,7 +170,6 @@ def train_and_evaluate_model_with_plot(hidden_layers, neurons_per_layer, epochs,
         verbose=2
     )
 
-    # Parametry użyte w modelu
     params = {
         "hidden_layers": hidden_layers,
         "neurons_per_layer": neurons_per_layer,
@@ -178,7 +178,6 @@ def train_and_evaluate_model_with_plot(hidden_layers, neurons_per_layer, epochs,
         "init": init
     }
 
-    # Rysowanie wykresu z parametrami
     plot_training_history_with_params(history, params)
 
     # Walidacja modelu
