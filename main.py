@@ -57,29 +57,47 @@ Loss Plot: Straty są wyższe zarówno dla danych treningowych, jak i walidacyjn
 ponieważ model ma ograniczone możliwości uczenia się.
 
 
-Plot 4 (Hidden Layers: 2, Neurons per Layer: 128, L2 reg: 0.0)
-Accuracy Plot: Krzywa dokładności dla danych treningowych wzrasta z każdą epoką,
-ale dokładność walidacji zaczyna się stabilizować, co wskazuje na zbliżanie się do limitu modelu.
-Nie użyto regularyzacji, co może skutkować overfittingiem w dalszych epokach.
+Plot 4 (Hidden Layers: 2, Neurons per Layer: 128, L2 reg: 0.0, init: glorot_uniform)
+Accuracy Plot: Model osiąga wysoką dokładność zarówno na danych treningowych, jak i walidacyjnych,
+co wskazuje na dobrą ogólną wydajność. Walidacyjna dokładność jest stabilna i zbliżona do treningowej,
+co sugeruje brak nadmiernego dopasowania.
 
-Loss Plot: Straty treningowe maleją konsekwentnie, ale różnica między stratą treningową i walidacyjną
-może się powiększać bez regularyzacji, co potwierdza brak ochrony przed overfittingiem.
-
-
-Plot 5 (Hidden Layers: 2, Neurons per Layer: 128, L2 reg: 0.01)
-Accuracy Plot: Krzywa dokładności treningowej rośnie wolniej w porównaniu do poprzedniego modelu,
-ale dokładność walidacyjna jest bardziej stabilna. Dodanie regularyzacji L2 pomogło zapobiec przeuczeniu.
-
-Loss Plot: Straty walidacyjne zmniejszają się bardziej proporcjonalnie do strat treningowych,
-co pokazuje efekt regularyzacji (karania dużych wag), co poprawia generalizację.
+Loss Plot: Strata szybko spada w pierwszych epokach, a następnie stabilizuje się.
+Zarówno strata treningowa, jak i walidacyjna pozostają niskie,
+co oznacza efektywne dopasowanie modelu.
 
 
-Plot 6 (Hidden Layers: 2, Neurons per Layer: 128, init: glorot_uniform)
-Accuracy Plot: Wyniki są stabilne od początku, ponieważ inicjalizacja „Glorot Uniform” (Xavier Initialization)
-zapewnia, że wagi początkowe są dobrze zbalansowane. Model uczy się szybko i dobrze radzi sobie na danych walidacyjnych.
+Plot 5 (Hidden Layers: 2, Neurons per Layer: 128, L2 reg: 0.0, init: he_normal)
 
-Loss Plot: Obie krzywe strat (treningowa i walidacyjna) są gładkie i spójne, co wskazuje, że inicjalizacja wag
-przyczyniła się do efektywnego trenowania.
+Accuracy Plot: Dokładność modelu na zbiorze treningowym jest wysoka,
+podobnie jak na walidacyjnym, z podobnym wzorcem co w przypadku "glorot_uniform".
+Wynik walidacji pozostaje stabilny, co świadczy o solidnym dopasowaniu.
+
+Loss Plot: Krzywe strat wskazują na szybki spadek strat treningowych i walidacyjnych
+w pierwszych epokach, ale ich dynamika w późniejszych epokach jest mniej gładka
+w porównaniu do "glorot_uniform". Może to wynikać z różnic w początkowej konfiguracji wag.
+
+Plot 6 (Hidden Layers: 2, Neurons per Layer: 128, L2 reg: 0.0, init: random_normal)
+Accuracy Plot: Dokładność na danych treningowych i walidacyjnych jest porównywalna
+do wcześniejszych przypadków, ale zmienność w walidacyjnej dokładności może wskazywać
+na nieco większą niestabilność w procesie uczenia.
+
+Loss Plot: Krzywe strat również wskazują na szybki spadek w pierwszych epokach,
+ale strata walidacyjna jest mniej stabilna w późniejszych epokach. Random Normal
+może prowadzić do większej zmienności w procesie uczenia w porównaniu do Glorot i He.
+
+
+    Ciekawostki o inicjalizacji wag:
+
+Glorot Uniform: Dobrze sprawdza się w modelach z aktywacjami opartymi na Sigmoid lub Tanh,
+ponieważ zapewnia równowagę między gradientami na różnych warstwach.
+
+He Normal: Optymalna dla aktywacji ReLU i jej wariantów, ponieważ pozwala
+na lepsze zachowanie sygnału w modelach głębszych.
+
+Random Normal: Może prowadzić do większej niestabilności uczenia,
+ponieważ wagi nie są skalowane względem liczby neuronów w warstwie,
+co zwiększa ryzyko eksplodujących lub zanikających gradientów.
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -144,19 +162,19 @@ def plot_training_history_with_params(history, params):
 # Funkcja do tworzenia i trenowania modelu z różnymi konfiguracjami
 def train_and_evaluate_model_with_plot(hidden_layers, neurons_per_layer, epochs, l2_reg=0.0, init='glorot_uniform'):
     # Tworzenie modelu
-    model = Sequential()
+    model = Sequential() #rodzaj modelu
     model.add(Input(shape=(28, 28)))
     model.add(Flatten())
 
     for _ in range(hidden_layers):
         model.add(Dense(neurons_per_layer, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(l2_reg),
                         kernel_initializer=init))
-
-    model.add(Dense(10, activation='softmax'))
+    #relu wejscie: -2 2 -5 7 -> 0 2 0 7
+    model.add(Dense(10, activation='softmax')) #output 0-9
 
     # Kompilacja modelu
     model.compile(
-        optimizer=Adam(learning_rate=0.001),
+        optimizer=Adam(learning_rate=0.001), # optymalizator - lepsza wersja klasycznegi alg liczenia gradientu
         loss=SparseCategoricalCrossentropy(),
         metrics=['accuracy']
     )
@@ -166,8 +184,9 @@ def train_and_evaluate_model_with_plot(hidden_layers, neurons_per_layer, epochs,
         X_train, y_train,
         validation_split=0.2,
         epochs=epochs,
-        batch_size=32,
-        verbose=2
+        batch_size=32, # uczy sie na 32 obrazach,
+        # po czym nastepujej zmiana wag (pomaga wyeliminowac szum)
+        verbose=0
     )
 
     params = {
